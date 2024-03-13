@@ -21,9 +21,8 @@ class BrandController {
 
     async delete(req, res, next) {
         try {
-            const { brandId } = req.body;
-            const count = await Brand.destroy({ where: { id: brandId } });
-            Brand.find
+            const { id } = req.body;
+            const count = await Brand.destroy({ where: { id } });
             return res.json({ message: `Удалено ${count} бренд(ов)` });
         } catch (e) {
             console.log(e);
