@@ -62,7 +62,7 @@ class ItemController {
                     typeId
                 }
             }
-            const { rows, count } = await Item.findAndCountAll({ where: itemsCondition, limit, offset });
+            const { rows, count } = await Item.findAndCountAll({ where: itemsCondition, limit, offset, include: [{ model: ItemInfo, as: 'info' }] });
 
             return res.json({ items: rows, count });
         } catch (e) {
