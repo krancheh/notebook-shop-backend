@@ -25,7 +25,7 @@ class UserController {
             const { firstName, lastName, email, password, role } = req.body;
 
             if (!email || !password || !firstName || !lastName) {
-                return next(ApiError.unathorized("Не указаны необходимые данные для регистрации"));
+                return next(ApiError.unathorized("Указаны не все поля"));
             }
 
             const candidate = await User.findOne({ where: { email } });
@@ -49,6 +49,11 @@ class UserController {
     async login(req, res, next) {
         try {
             const { email, password } = req.body;
+
+            if (!email || !password) {
+                return next(ApiError.unathorized('Указаны не все поля'));
+            }
+
             const user = await User.findOne(
                 {
                     where: { email }
@@ -56,12 +61,12 @@ class UserController {
             );
 
             if (!user) {
-                return next(ApiError.unathorized('Пользователь с таким email не найден'));
+                return next(ApiError.unathorized('Неверный email или пароль'));
             }
-
             const passwordIsCorrect = bcrypt.compareSync(password, user.password);
+
             if (!passwordIsCorrect) {
-                return next(ApiError.unathorized('Указан неверный пароль'));
+                return next(ApiError.unathorized('Неверный email или пароль'));
             }
 
             const token = generateToken(user.id, user.email, user.role);
