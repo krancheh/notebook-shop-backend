@@ -8,9 +8,15 @@ module.exports = function (req, res, next) {
     try {
         const token = req.cookies["auth"].split(' ')[1];
         if (!token) {
-            next(ApiError.unathorized("Пользователь не авторизован"));
+            return next(ApiError.unathorized("Пользователь не авторизован"));
         }
-        req.user = jwt.verify(token, process.env.SECRET_KEY)
+        const user = jwt.verify(token, process.env.SECRET_KEY);
+
+        if (!user) {
+            return next(ApiError.unathorized("Пользователь не авторизован"));
+        }
+
+        req.user = user;
         next()
     } catch (e) {
         next(ApiError.internal("Ошибка авторизации"));
