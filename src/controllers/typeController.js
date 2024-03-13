@@ -18,6 +18,17 @@ class TypeController {
         }
     }
 
+    async delete(req, res, next) {
+        try {
+            const { id } = req.body;
+            const count = await Type.destroy({ where: { id } });
+            return res.json({ message: `Удалено ${count} тип(ов)` });
+        } catch (e) {
+            console.log(e);
+            return next(ApiError.internal("Произошла ошибка"));
+        }
+    }
+
     async getAll(req, res, next) {
         try {
             const types = await Type.findAll();
