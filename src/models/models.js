@@ -13,11 +13,11 @@ const User = sequelize.define('user', {
 
 const Basket = sequelize.define('basket', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }
-});
+}, { timestamps: false });
 
 const BasketItem = sequelize.define('basket_item', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }
-});
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+}, { timestamps: false });
 
 const Item = sequelize.define('item', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -29,24 +29,24 @@ const Item = sequelize.define('item', {
 const Type = sequelize.define('type', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, unique: true, allowNull: false },
-});
+}, { timestamps: false });
 
 const Brand = sequelize.define('brand', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, unique: true, allowNull: false },
-});
+}, { timestamps: false });
 
 const ItemInfo = sequelize.define('item_info', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     title: { type: DataTypes.STRING, allowNull: false },
     description: { type: DataTypes.STRING, allowNull: false }
-});
+}, { timestamps: false });
 
 
 User.hasOne(Basket);
 Basket.belongsTo(User);
 
-Basket.hasMany(BasketItem);
+Basket.hasMany(BasketItem, { as: 'items' });
 BasketItem.belongsTo(Basket);
 
 Brand.hasMany(Item);
