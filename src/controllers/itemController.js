@@ -29,6 +29,17 @@ class ItemController {
         }
     }
 
+    async delete(req, res, next) {
+        try {
+            const { id } = req.body;
+            const count = await Item.destroy({ where: { id } });
+            return res.json({ message: `Удалено ${count} товаров(ов)` });
+        } catch (e) {
+            console.log(e);
+            return next(ApiError.internal("Произошла ошибка"));
+        }
+    }
+
     async get(req, res, next) {
 
         try {
@@ -37,16 +48,21 @@ class ItemController {
             limit = limit || 9;
             page = page || 1;
             let offset = page * limit - limit;
-            let itemCondition;
+            let itemsCondition;
 
             if (brandId) {
-                itemCondition.brandId = brandId;
+                itemsCondition = {
+                    brandId
+                }
             }
 
             if (typeId) {
-                itemCondition.typeId = typeId;
+                itemsCondition = {
+                    ...itemsCondition,
+                    typeId
+                }
             }
-            const { rows, count } = await Item.findAndCountAll({ where: itemCondition, limit, offset });
+            const { rows, count } = await Item.findAndCountAll({ where: itemsCondition, limit, offset });
 
             return res.json({ items: rows, count });
         } catch (e) {
