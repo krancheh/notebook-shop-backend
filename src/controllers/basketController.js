@@ -34,7 +34,36 @@ class BasketController {
 
             const basketItem = await BasketItem.create({ basketId, itemId });
 
-            return res.json({ basketItem });
+            const item = await Item.findOne({
+                where: { id: itemId },
+                attributes: ["id", "name", "price", "img"],
+                include: [
+                    {
+                        model: ItemInfo, as: 'info'
+                    },
+                    {
+                        model: Brand,
+                        attributes: ["id", 'name'],
+                    },
+                    {
+                        model: Type,
+                        attributes: ['id', 'name'],
+                    },
+                ]
+            });
+
+            const resultItem = {
+                basketItemId: basketItem.id,
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                img: item.img,
+                brand: item.brand,
+                type: item.type,
+                info: item.info
+            }
+
+            return res.json({ item: resultItem });
         } catch (e) {
             console.log(e);
             next(ApiError.internal("Произошла ошибка"));
@@ -44,6 +73,7 @@ class BasketController {
     async removeItems(req, res, next) {
         try {
             const { ids } = req.body;
+            console.log(req.body);
             const count = await BasketItem.destroy({ where: { id: ids } });
             return res.json({ message: `Удалено товаров в корзине: ${count}` });
         } catch (e) {
@@ -59,7 +89,7 @@ class BasketController {
                 where: { userId },
                 include: [{
                     model: BasketItem,
-                    attributes: ['itemId'],
+                    attributes: ['id', 'itemId'],
                     as: 'items',
                     include: [{
                         model: Item,
@@ -73,6 +103,9 @@ class BasketController {
                                 model: Type,
                                 attributes: ['name'],
                             },
+                            {
+                                model: ItemInfo, as: 'info'
+                            }
                         ]
                     }]
                 }]
@@ -84,13 +117,16 @@ class BasketController {
             }
 
             const formattedBasket = {
+                id: basket.id,
                 items: basket.items.map(basketItem => ({
+                    basketItemId: basketItem.id,
                     id: basketItem.itemId,
-                    brand: basketItem.item.brand?.name,
-                    type: basketItem.item.type?.name,
+                    brand: basketItem.item.brand,
+                    type: basketItem.item.type,
                     name: basketItem.item.name,
                     img: basketItem.item.img,
-                    price: basketItem.item.price
+                    price: basketItem.item.price,
+                    info: basketItem.item.info
                 }))
             }
 

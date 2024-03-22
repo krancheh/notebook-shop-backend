@@ -83,7 +83,8 @@ class UserController {
             const { user } = req;
             const token = generateToken(user.id, user.email, user.role);
             setAuthCookie(token, res);
-            return res.json({ user });
+            const { firstName } = await User.findByPk(user.id);
+            return res.json({ user: { ...user, firstName } });
         } catch (e) {
             console.log(e);
             return next(ApiError.internal("Произошла ошибка"));

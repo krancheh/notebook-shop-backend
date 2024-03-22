@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken')
-const ApiError = require('../error/ApiError')
+const ApiError = require('../error/ApiError');
+const { User } = require('../models/models');
 
-module.exports = function (req, res, next) {
+module.exports = async function (req, res, next) {
     if (res.method === 'OPTIONS') {
         next()
     }
@@ -11,9 +12,10 @@ module.exports = function (req, res, next) {
             return next(ApiError.unathorized("Пользователь не авторизован"));
         }
         const user = jwt.verify(token, process.env.SECRET_KEY);
+        const candidate = await User.findOne({ where: { id: user.id, email: user.email, role: user.role } });
 
-        if (!user) {
-            return next(ApiError.unathorized("Пользователь не авторизован"));
+        if (!candidate) {
+            return next(ApiError.unathorized("Пользователь не найден"));
         }
 
         req.user = user;

@@ -1,3 +1,4 @@
+const ApiError = require('../error/ApiError');
 const { Type } = require('../models/models');
 
 class TypeController {
@@ -5,7 +6,7 @@ class TypeController {
         try {
             const name = req.body.name[0].toUpperCase() + req.body.name.slice(1);
 
-            const candidate = await Brand.findOne({ where: { name } })
+            const candidate = await Type.findOne({ where: { name } })
             if (candidate) {
                 next(ApiError.badRequest("Такой тип уже существует"));
             }

@@ -1,6 +1,6 @@
 const uuid = require("uuid");
 const path = require("path");
-const { Item, ItemInfo } = require("../models/models");
+const { Item, ItemInfo, Brand, Type } = require("../models/models");
 const ApiError = require("../error/ApiError");
 
 class ItemController {
@@ -62,7 +62,23 @@ class ItemController {
                     typeId
                 }
             }
-            const { rows, count } = await Item.findAndCountAll({ where: itemsCondition, limit, offset, include: [{ model: ItemInfo, as: 'info' }] });
+            const { rows, count } = await Item.findAndCountAll({
+                where: itemsCondition, limit, offset,
+                attributes: ["id", "name", "price", "img"],
+                include: [
+                    {
+                        model: ItemInfo, as: 'info'
+                    },
+                    {
+                        model: Brand,
+                        attributes: ["id", 'name'],
+                    },
+                    {
+                        model: Type,
+                        attributes: ['id', 'name'],
+                    },
+                ]
+            });
 
             return res.json({ items: rows, count });
         } catch (e) {
@@ -75,12 +91,23 @@ class ItemController {
 
         try {
             const { id } = req.params;
-            const item = await Item.findOne(
-                {
-                    where: { id },
-                    include: [{ model: ItemInfo, as: 'info' }],
-                },
-            );
+            const item = await Item.findOne({
+                where: { id },
+                attributes: ["id", "name", "price", "img"],
+                include: [
+                    {
+                        model: ItemInfo, as: 'info'
+                    },
+                    {
+                        model: Brand,
+                        attributes: ["id", 'name'],
+                    },
+                    {
+                        model: Type,
+                        attributes: ['id', 'name'],
+                    },
+                ]
+            });
             return res.json({ item });
         } catch (e) {
             console.log(e);
