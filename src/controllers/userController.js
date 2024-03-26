@@ -115,6 +115,16 @@ class UserController {
         }
     }
 
+    async logout(req, res, next) {
+        try {
+            res.clearCookie('auth', { httpOnly: true });
+            return res.status(200).send("Успешный выход");
+        } catch (e) {
+            console.log(e);
+            return next(ApiError.internal("Произошла ошибка"));
+        }
+    }
+
 }
 
 module.exports = new UserController();
